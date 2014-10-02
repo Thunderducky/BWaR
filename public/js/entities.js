@@ -53,3 +53,18 @@ game.PlayerEntity = melon.Entity.extend({
 		return false;
 	}
 }); 
+
+game.CoinEntity = melon.Entity.extend({
+	init: function(x,y,settings){
+		var me = this;
+
+		me._super(me.CollectableEntity, 'init', [x,y, settings]);
+		me.body.onCollision = me.body.onCollision.bind(me);
+	},
+	onCollision: function(){
+		var me = this;
+		me.body.setCollisionMask(melon.collision.types.NO_OBJECT);
+		
+		melon.game.world.removeChild(me);
+	}
+});

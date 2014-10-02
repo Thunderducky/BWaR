@@ -2,7 +2,7 @@ var melon = me;
 
 game.PlayScreen = melon.ScreenObject.extend({
 	onResetEvent: function(){
-		melon.levelDirector.loadLevel("area01");
+		melon.levelDirector.loadLevel("area02");
 		// RESET OPTIONS
 		// ADD HUD TO GAME WORLD
 

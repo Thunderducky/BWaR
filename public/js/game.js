@@ -32,8 +32,11 @@ var game = {
 		melon.pool.register("mainPlayer", game.PlayerEntity)
 
 		melon.input.bindKey(me.input.KEY.LEFT,  "left");
+    	melon.input.bindKey(me.input.KEY.A,  	"left");
     	melon.input.bindKey(me.input.KEY.RIGHT, "right");
-    	melon.input.bindKey(me.input.KEY.X,     "jump", true);
+    	melon.input.bindKey(me.input.KEY.D,  	"right");
+
+    	melon.input.bindKey(me.input.KEY.SPACE,     "jump", true);
 
 		// Start the game.
 		melon.state.change(me.state.PLAY);
