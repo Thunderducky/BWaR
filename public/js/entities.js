@@ -28,6 +28,7 @@ game.PlayerEntity = melon.Entity.extend({
 			me.body.vel.x += me.body.accel.x * melon.timer.tick;
 		}
 		else {
+			me.alpha = 1;
 			me.body.vel.x = 0;
 		}
 
