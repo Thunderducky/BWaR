@@ -8,6 +8,7 @@ game.resources = [
 	 // Tileset
 	 { name: "area01_level_tiles", type:"image", src:"game_assets/img/map/area01_level_tiles.png"},
 	 { name: "forest", type:"image", src:"game_assets/img/map/forest.png"},
+	 { name: "mountains", type:"image", src:"game_assets/img/map/mountains.png"},
 	 { name: "metatiles32x32", type:"image", src:"game_assets/img/map/metatiles32x32.png"},
 	 
 	 // Parallax Background
@@ -27,7 +28,8 @@ game.resources = [
 
 	 // Maps
 	 { name: "area01", type:"tmx", src: "game_assets/map/area01.tmx"},
-	 { name: "area02", type:"tmx", src: "game_assets/map/area02.tmx"}
+	 { name: "area02", type:"tmx", src: "game_assets/map/area02.tmx"},
+	 { name: "area03", type:"tmx", src: "game_assets/map/area03.tmx"}
 
 	/* Atlases 
 	 * @example
