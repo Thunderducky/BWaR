@@ -23,7 +23,7 @@ var TilePatch = function(){
 	me.tilesHigh = 0;
 	me.tilesWide = 0;
 
-	me.init = function(x,y,width,height){
+	me.init = function(x,y,width,height, tileId){
 		me.origin.x = x;
 		me.origin.y = y;
 
@@ -37,7 +37,7 @@ var TilePatch = function(){
 
 			for(var j = 0; j < height; j++)
 			{
-				column.push(new Tile().init(i,j));
+				column.push(new Tile().init(i,j, tileId));
 			}
 			me.tiles.push(column);
 		}
@@ -68,9 +68,77 @@ var levelGenerator = function(){
 			}
 		}
 		return patch;
+	};
+
+	me.generatePlatform = function(width, height, tileId, tileId2){
+		var patch = new TilePatch().init(0,0,width,height);
+		for(var i = 0; i < width; i++)
+		{
+			for(var j = 0; j < height; j++)
+			{
+				patch.tiles[i][j].tileId = j == 0 ? tileId : tileId2 || tileId;
+			}
+		}
+		return patch;
 	}
 
-	me.generateLevel = function(level){
+	var getRandom = function(min,max){
+		return Math.floor(Math.random() * (max-min) + min);
+	};
+
+	var randomIntervalGenerator = function(){
+		var me = this;
+		me.intervalLeft = 0;
+		me.minInterval = 1;
+		me.maxInterval = 1;
+
+		me.tick = function(){
+			me.intervalLeft--;
+			if(me.intervalLeft <= 0){
+				me.onReset();
+				me.intervalLeft = getRandom(me.minInterval, me.maxInterval);
+			}
+			
+		};
+		me.onReset = function(){};
+
+		me.init = function(min,max,onReset){
+
+			me.minInterval = min;
+			me.maxInterval = max;
+			me.intervalLeft = getRandom(me.minInterval, me.maxInterval);
+			me.onReset = onReset || me.onReset;
+
+			return me;
+		}
+	};
+
+	var GetTopHeightIndex = function(layer, column){
+		for(var i = 0; i < layer.rows; i++)
+		{
+			if(layer.getTile(column*32 + 1, i * 32 + 1) !== null)
+			{
+				return i;
+			}
+		}
+		return layer.rows - 1;
+	};
+
+	var applyPatch = function(patch, layer){
+		for(var i = 0; i < patch.tilesWide; i++)
+		{
+			for(var j = 0; j < patch.tilesHigh; j++)
+			{
+				var patchTile = patch.tiles[i][j];
+				// If it's not null, because 0 might be a valid item
+				if(patchTile.tileId !== null){
+					layer.setTile(patchTile.x + patch.origin.x, patchTile.y + patch.origin.y, patchTile.tileId);
+				}
+			}
+		}
+	};
+
+	me.generateLevel2 = function(level){
 		//me.map = map;
 		me.level = level;
 
@@ -108,42 +176,10 @@ var levelGenerator = function(){
 		}
 		var TL = tileIdLibrary;
 
-		var getRandom = function(min,max){
-			return Math.floor(Math.random() * (max-min) + min);
-		}
-
-		var randomIntervalGenerator = function(){
-			var me = this;
-			me.intervalLeft = 0;
-			me.minInterval = 1;
-			me.maxInterval = 1;
-
-			me.tick = function(){
-				me.intervalLeft--;
-				if(me.intervalLeft <= 0){
-					me.onReset();
-					me.intervalLeft = getRandom(me.minInterval, me.maxInterval);
-				}
-				
-			};
-			me.onReset = function(){};
-
-			me.init = function(min,max,onReset){
-
-				me.minInterval = min;
-				me.maxInterval = max;
-				me.intervalLeft = getRandom(me.minInterval, me.maxInterval);
-				me.onReset = onReset || me.onReset;
-
-				return me;
-			}
-		};
-		
-
 		// Generate foreground
 		var minHeight = 1, height = 6; maxHeight = 8, maxDifference = 2;
 
-		var heightController = new randomIntervalGenerator().init(4,12,
+		var heightController = new randomIntervalGenerator().init(2,8,
 			function(){
 				// Generate the new height
 				height = getRandom(height - maxDifference, height + maxDifference + 1);
@@ -177,31 +213,130 @@ var levelGenerator = function(){
 		//levelGate.addShape((level.cols-1)*32,0,32,level.rows*32);
 		//melon.game.world.addChild(levelGate);
 		// for now we're going to build column patches and apply them
-
 	};
 
-	var GetTopHeightIndex = function(layer, column){
-		for(var i = 0; i < layer.rows; i++)
-		{
-			if(layer.getTile(column*32 + 1, i * 32 + 1) !== null)
-			{
-				return i;
-			}
+	me.generateLevel = function(level){
+		me.level = level;
+
+		// Get Tilesets
+		var tilesets = level.tilesets.tilesets;
+
+		var mountainTS = null;
+		var forestTS = null
+		var metaTS = null;
+		for(var i = 0; i < tilesets.length; i++){
+			if(tilesets[i].name == "mountains"){ 			mountainTS = tilesets[i];}
+			else if(tilesets[i].name == "forest"){ 			forestTS = tilesets[i];}
+			else if(tilesets[i].name == "metatiles32x32"){ 	metaTS = tilesets[i];}
 		}
-		return layer.rows - 1;
+
+		// Get Layers
+		for(var i = 0; i < level.mapLayers.length; i++)
+		{
+			// Background Layers
+			if(level.mapLayers[i].name == "Background1"){ 
+				me.background1 = level.mapLayers[i];
+			} else if (level.mapLayers[i].name == "Background2"){
+				me.background2 = level.mapLayers[i];
+			} else if (level.mapLayers[i].name == "Background3"){
+				me.background3 = level.mapLayers[i];
+			} 
+
+			// Foreground and Collision
+			else if (level.mapLayers[i].name == "Foreground"){
+				me.foreground = level.mapLayers[i];
+			} else if (level.mapLayers[i].name == "collision"){
+				me.collision = level.mapLayers[i];
+			}
+
+		}
+		var TL = tileIdLibrary;
+
+		var platformIndex = 0;
+		var platformLength = 0, lengthMin = 2, lengthMax = 6;
+		var platformHeight = 0, heightMin = 1, heightMax = 5;
+		var airLength = 0, airMin = 2, airMax = 4;
+		// build platforms
+		while(platformIndex < level.cols - 1){
+			
+
+			platformLength = getRandom(lengthMin, lengthMax) + 1;
+			platformHeight = getRandom(heightMin, heightMax);
+
+			if(level.cols <= platformIndex + platformLength)
+			{
+				platformLength = level.cols - platformIndex;
+			}
+
+			var gPlatform = me.generatePlatform(platformLength, level.rows - platformHeight - 1, forestTS.firstgid + TL.forest.ground.top, forestTS.firstgid + TL.forest.ground.mid);
+			var cPlatform = me.generatePlatform(platformLength, level.rows - platformHeight - 1, metaTS.firstgid + TL.meta.solid)
+			
+			gPlatform.origin.x = platformIndex;
+			gPlatform.origin.y = level.rows - platformHeight - 1;
+			cPlatform.origin.x = platformIndex;
+			cPlatform.origin.y = level.rows - platformHeight - 1;
+
+			platformIndex += platformLength;
+
+			applyPatch(gPlatform, me.foreground);
+			applyPatch(cPlatform, me.collision);
+
+			// build an air space
+
+			airLength = getRandom(airMin, airMax);
+			platformIndex += airLength;
+			// Build a Platform
+			// Build Spacing
+			// Edge check
+			// Add
+		}
+
+		// Build Backgrounds
+
+		// for now we're just going to build a giant patch to slap on the back
+		var lightBGID = forestTS.firstgid + TL.forest.darkBG;
+		var mountainTop = forestTS.firstgid + 10;
+		var mountainMid = forestTS.firstgid + 28;
+		var backgroundTilePatch = new TilePatch().init(0,3, level.cols, level.rows, mountainTop);
+		var backgroundTilePatch2 = new TilePatch().init(0,4, level.cols, 1, mountainMid);
+		var backgroundTilePatch3 = new TilePatch().init(0,5, level.cols, level.rows - 5, lightBGID);
+		applyPatch(backgroundTilePatch, me.background3);
+		applyPatch(backgroundTilePatch2, me.background3);
+		applyPatch(backgroundTilePatch3, me.background3);
+		
+		// Build Trees
+		// Find the where we need to start in the foreground, then build a tree up from there
+
+
+		// FRONT TREES
+		var treeColumnIndex = 0;
+		var treeBot = forestTS.firstgid + TL.forest.tree1.bottom;
+		var treeMid = forestTS.firstgid + TL.forest.tree1.middle[0];
+		treeColumnIndex += getRandom(0,4);
+		while(treeColumnIndex < level.cols){
+			// find bottom
+			var heightIndex = GetTopHeightIndex(me.foreground, treeColumnIndex);
+			if(heightIndex < level.rows -1){
+				// We've found a platform
+				var treePatch = new TilePatch().init(treeColumnIndex, 0, 1, heightIndex ,treeMid);
+				treePatch.tiles[0][treePatch.tilesHigh -1].tileId = treeBot;
+				applyPatch(treePatch, me.background1);
+			}
+			treeColumnIndex+= getRandom(1,12);
+		}
+
+		//ackground trees
+		var tree2Index = 0;
+		var backTreeId = forestTS.firstgid + TL.forest.backgroundTrees1[0];
+		tree2Index += getRandom(0,4);
+		while(tree2Index < level.cols){
+			// find bottom
+			var backTreePatch = new TilePatch().init(tree2Index, 0, 1, level.cols-1, backTreeId);
+			tree2Index+= getRandom(1,6);
+			applyPatch(backTreePatch, me.background2);
+		}
+
 	};
 
-	var applyPatch = function(patch, layer){
-		for(var i = 0; i < patch.tilesWide; i++)
-		{
-			for(var j = 0; j < patch.tilesHigh; j++)
-			{
-				var patchTile = patch.tiles[i][j];
-				// If it's not null, because 0 might be a valid item
-				if(patchTile.tileId !== null){
-					layer.setTile(patchTile.x + patch.origin.x, patchTile.y + patch.origin.y, patchTile.tileId);
-				}
-			}
-		}
-	};
+	
 };

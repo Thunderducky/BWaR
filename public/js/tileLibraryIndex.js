@@ -16,7 +16,10 @@ var tileIdLibrary =
 			bottom: 7,
 			middle: [8,9]
 		},
-		backgroundTrees1:[33,34]
+		backgroundTrees1:[33,34],
+
+		lightBG : 35,
+		darkBG : 36
 	},
 	meta : {
 		solid : 0

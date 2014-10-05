@@ -31,12 +31,15 @@ var game = {
 
 		melon.pool.register("mainPlayer", game.PlayerEntity);
 		melon.pool.register("levelGate", game.LevelGate);
+		melon.pool.register("killPlane", game.KillPlane);
 		//melon.pool.register("levelGate", game.LevelGate)
 
 		melon.input.bindKey(me.input.KEY.LEFT,  "left");
     	melon.input.bindKey(me.input.KEY.A,  	"left");
     	melon.input.bindKey(me.input.KEY.RIGHT, "right");
     	melon.input.bindKey(me.input.KEY.D,  	"right");
+
+    	melon.input.bindKey(me.input.KEY.ESC, "pause", true);
 
     	melon.input.bindKey(me.input.KEY.SPACE,     "jump", true);
 

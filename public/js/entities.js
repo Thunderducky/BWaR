@@ -12,26 +12,15 @@ game.PlayerEntity = melon.Entity.extend({
 		melon.game.viewport.follow(me.pos, melon.game.viewport.AXIS.BOTH);
 	
 		me.alwaysUpdate = true;
-		console.log(me.body.collisionType);
+
+		me.paused = false;
 	},
 
 	update: function(dt){
 
 		var me = this;
 
-		// Left / Right 
-		if(melon.input.isKeyPressed('left')){
-			me.flipX(true);
-			me.body.vel.x -= me.body.accel.x * melon.timer.tick;
-		}
-		else if(melon.input.isKeyPressed('right')){
-			me.flipX(false);
-			me.body.vel.x += me.body.accel.x * melon.timer.tick;
-		}
-		else {
-			me.alpha = 1;
-			me.body.vel.x = 0;
-		}
+		me.body.vel.x = 10;
 
 		// Jump
 		if(melon.input.isKeyPressed('jump')){
@@ -40,39 +29,39 @@ game.PlayerEntity = melon.Entity.extend({
 				me.body.jumping = true;
 			}
 		}
+
 		if(melon.input.keyStatus('jump') && me.body.falling)
 		{
 			me.body.vel.y = maxFallSpeed;
 		}
-		me.body.update(dt);
 
-		melon.collision.check(me, true, me.collideHandler.bind(me), true);
-
-		// update animation
-		if(me.body.vel.x != 0 || me.body.vel.y != 0){
-			me._super(melon.Entity, 'update', [dt]);
-			return true;
+		if(melon.input.isKeyPressed('pause')){
+			me.paused = !me.paused;
 		}
 
+		if(!me.paused)
+		{
+			me.body.update(dt);
+			melon.collision.check(me, true, me.collideHandler.bind(me), true);
 
-
-		return false;
+			// update animation
+			if(me.body.vel.x != 0 || me.body.vel.y != 0){
+				me._super(melon.Entity, 'update', [dt]);
+				return true;
+			}
+			return false;
+		}
+		else
+		{
+			return false;
+		}
 	},
 
 	collideHandler : function(response){
-		console.log(response.b);
-		var me = this;
-		if(response.b.name == "levelgate")
-		{
-			// Remove myself
-			//melon.game.world.removeChild(me);
-
-			//melon.levelDirector.loadLevel("area03");
-
-
-
-			// var lg = new levelGenerator();
-			// lg.generateLevel(melon.game.currentLevel);
+		if(response.b.name == "killplane"){
+			var me = this;
+			me.bounds.pos.x = 0;
+			me.bounds.pos.y = 0;
 		}
 	}
 }); 
@@ -98,7 +87,6 @@ game.LevelGate = melon.LevelEntity.extend({
             }
         } else {
             melon.levelDirector.loadLevel(me.gotolevel);
-            console.log("HIT");
             var lg = new levelGenerator();
 			lg.generateLevel(melon.game.currentLevel);
         }
@@ -113,9 +101,25 @@ game.LevelGate = melon.LevelEntity.extend({
     		var me = this;
             melon.levelDirector.loadLevel(me.gotolevel);
             melon.game.viewport.fadeOut(me.fade, me.duration);
-            console.log("HIT");
             var lg = new levelGenerator();
 			lg.generateLevel(melon.game.currentLevel);
+    },
+});
+
+game.KillPlane = melon.Entity.extend({
+	init: function(x,y, settings){
+		var me = this;
+		me._super(melon.Entity, 'init', [x,y,settings]);
+	},
+	getShape : function(){
+		var me = this;
+		return new me.Rect(me.x, me.y, me.width, me.height);
+	},
+
+    /** @ignore */
+    onCollision : function () {
+        // Reset to initial start
+
     },
 });
 
