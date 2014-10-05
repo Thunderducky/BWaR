@@ -113,6 +113,10 @@ var levelGenerator = function(){
 		}
 	};
 
+	var randomPick = function(choices){
+		return choices[getRandom(0, choices.length)];
+	};
+
 	var GetTopHeightIndex = function(layer, column){
 		for(var i = 0; i < layer.rows; i++)
 		{
@@ -312,14 +316,48 @@ var levelGenerator = function(){
 		var treeColumnIndex = 0;
 		var treeBot = forestTS.firstgid + TL.forest.tree1.bottom;
 		var treeMid = forestTS.firstgid + TL.forest.tree1.middle[0];
+		var treeMid2 = forestTS.firstgid + TL.forest.tree1.middle[1];
+
+		var tree2Bot = forestTS.firstgid + TL.forest.tree2.bottom;
+		var tree2Mid = forestTS.firstgid + TL.forest.tree2.middle[0];
+		var tree2Mid2 = forestTS.firstgid + TL.forest.tree2.middle[1];
+		
+
+		var knothole = forestTS.firstgid + TL.forest.tree1.knothole;
+
 		treeColumnIndex += getRandom(0,4);
 		while(treeColumnIndex < level.cols){
 			// find bottom
 			var heightIndex = GetTopHeightIndex(me.foreground, treeColumnIndex);
 			if(heightIndex < level.rows -1){
 				// We've found a platform
-				var treePatch = new TilePatch().init(treeColumnIndex, 0, 1, heightIndex ,treeMid);
-				treePatch.tiles[0][treePatch.tilesHigh -1].tileId = treeBot;
+				var use1 = randomPick([true,false]);
+				var treePatch = null;
+
+				// Tree 1
+				if(randomPick([true,false]))
+				{
+					var treePatch = new TilePatch().init(treeColumnIndex, 0, 1, heightIndex ,randomPick([treeMid, treeMid2]));
+					treePatch.tiles[0][treePatch.tilesHigh -1].tileId = treeBot;
+					
+					// Put in a knothole
+					if(getRandom(0,5) == 0)
+					{
+						var knotholeIndex = getRandom(0, treePatch.tilesHigh - 1);
+						treePatch.tiles[0][knotholeIndex].tileId = knothole;
+					}
+				}
+				// Tree2
+				else
+				{
+					var treePatch = new TilePatch().init(treeColumnIndex, 0, 1, heightIndex ,randomPick([tree2Mid, tree2Mid2]));
+					treePatch.tiles[0][treePatch.tilesHigh -1].tileId = tree2Bot;
+				}
+				// randomize some pieces to switch out
+
+				
+
+
 				applyPatch(treePatch, me.background1);
 			}
 			treeColumnIndex+= getRandom(1,12);
@@ -328,6 +366,7 @@ var levelGenerator = function(){
 		//ackground trees
 		var tree2Index = 0;
 		var backTreeId = forestTS.firstgid + TL.forest.backgroundTrees1[0];
+		var backTreeId2 = forestTS.firstgid + TL.forest.backgroundTrees1[1];
 		tree2Index += getRandom(0,4);
 		while(tree2Index < level.cols){
 			// find bottom

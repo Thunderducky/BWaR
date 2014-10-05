@@ -10,7 +10,8 @@ var tileIdLibrary =
 		},
 		tree1 : {
 			bottom: 3,
-			middle:[4,5,6]
+			middle:[4,5],
+			knothole: 6
 		},
 		tree2 : {
 			bottom: 7,
