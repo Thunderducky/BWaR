@@ -12,6 +12,7 @@ game.PlayerEntity = melon.Entity.extend({
 		melon.game.viewport.follow(me.pos, melon.game.viewport.AXIS.BOTH);
 	
 		me.alwaysUpdate = true;
+		console.log(me.body.collisionType);
 	},
 
 	update: function(dt){
@@ -45,27 +46,76 @@ game.PlayerEntity = melon.Entity.extend({
 		}
 		me.body.update(dt);
 
+		melon.collision.check(me, true, me.collideHandler.bind(me), true);
+
 		// update animation
 		if(me.body.vel.x != 0 || me.body.vel.y != 0){
 			me._super(melon.Entity, 'update', [dt]);
 			return true;
 		}
 
+
+
 		return false;
+	},
+
+	collideHandler : function(response){
+		console.log(response.b);
+		var me = this;
+		if(response.b.name == "levelgate")
+		{
+			// Remove myself
+			//melon.game.world.removeChild(me);
+
+			//melon.levelDirector.loadLevel("area03");
+
+
+
+			// var lg = new levelGenerator();
+			// lg.generateLevel(melon.game.currentLevel);
+		}
 	}
 }); 
 
-game.CoinEntity = melon.Entity.extend({
-	init: function(x,y,settings){
+game.LevelGate = melon.LevelEntity.extend({
+	init: function(x,y, settings){
 		var me = this;
-
-		me._super(me.CollectableEntity, 'init', [x,y, settings]);
-		me.body.onCollision = me.body.onCollision.bind(me);
+		me._super(melon.LevelEntity, 'init', [x,y,settings]);
 	},
-	onCollision: function(){
+	getShape : function(){
 		var me = this;
-		me.body.setCollisionMask(melon.collision.types.NO_OBJECT);
-		
-		melon.game.world.removeChild(me);
-	}
+		return new me.Rect(me.x, me.y, me.width, me.height);
+	},
+	goTo : function (level) {
+		var me = this;
+        me.gotolevel = level || me.nextlevel;
+        // load a level
+        //console.log("going to : ", to);
+        if (me.fade && me.duration) {
+            if (!me.fading) {
+                me.fading = true;
+                melon.game.viewport.fadeIn(me.fade, me.duration, me.onFadeComplete.bind(me));
+            }
+        } else {
+            melon.levelDirector.loadLevel(me.gotolevel);
+            console.log("HIT");
+            var lg = new levelGenerator();
+			lg.generateLevel(melon.game.currentLevel);
+        }
+    },
+
+    /** @ignore */
+    onCollision : function () {
+        this.goTo();
+    },
+
+    onFadeComplete : function () {
+    		var me = this;
+            melon.levelDirector.loadLevel(me.gotolevel);
+            melon.game.viewport.fadeOut(me.fade, me.duration);
+            console.log("HIT");
+            var lg = new levelGenerator();
+			lg.generateLevel(melon.game.currentLevel);
+    },
 });
+

@@ -171,6 +171,11 @@ var levelGenerator = function(){
 			applyPatch(graphicColumn, me.foreground);
 			applyPatch(collisionColumn, me.collision);
 		}
+
+		// Build Level gate for the very right
+		//var levelGate = new game.LevelGate(4,0, {width: 32, height: level.rows*32});
+		//levelGate.addShape((level.cols-1)*32,0,32,level.rows*32);
+		//melon.game.world.addChild(levelGate);
 		// for now we're going to build column patches and apply them
 
 	};

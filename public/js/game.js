@@ -29,7 +29,9 @@ var game = {
 		//melon.state.set(me.state.MENU, new game.TitleScreen());
 		melon.state.set(me.state.PLAY, new game.PlayScreen());
 
-		melon.pool.register("mainPlayer", game.PlayerEntity)
+		melon.pool.register("mainPlayer", game.PlayerEntity);
+		melon.pool.register("levelGate", game.LevelGate);
+		//melon.pool.register("levelGate", game.LevelGate)
 
 		melon.input.bindKey(me.input.KEY.LEFT,  "left");
     	melon.input.bindKey(me.input.KEY.A,  	"left");
