@@ -57,6 +57,8 @@ var levelGenerator = function(){
 	me.foreground = null;
 	me.collision = null;
 
+	me.playerStart = {x:0,y:0};
+
 	me.generatePatchColumn = function(height, segmentLengths, segmentData){
 		var patch = new TilePatch().init(0,0,1,height);
 		var index = 0;
@@ -363,7 +365,7 @@ var levelGenerator = function(){
 			treeColumnIndex+= getRandom(1,12);
 		}
 
-		//ackground trees
+		// background trees
 		var tree2Index = 0;
 		var backTreeId = forestTS.firstgid + TL.forest.backgroundTrees1[0];
 		var backTreeId2 = forestTS.firstgid + TL.forest.backgroundTrees1[1];

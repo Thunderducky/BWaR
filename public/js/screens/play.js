@@ -36,10 +36,18 @@ game.PlayScreen = melon.ScreenObject.extend({
 		};
 
 		var loadLevel3 = function(){
+			var me = this;
 			melon.levelDirector.loadLevel("area03");
 
 			var lg = new levelGenerator();
 			lg.generateLevel(melon.game.currentLevel);
+
+			game.data.screens = 0;
+			game.data.deaths = 0;
+
+			me.HUD = new game.HUD.Container();
+			melon.game.world.addChild(me.HUD);
+
 		};
 
 		loadLevel3();
@@ -47,5 +55,6 @@ game.PlayScreen = melon.ScreenObject.extend({
 	},
 	onDestroyEvent: function(){
 		// REMOVE HUD FROM THE GAME WORLD
+		melon.game.world.removeChild(this.HUD);
 	}
 });

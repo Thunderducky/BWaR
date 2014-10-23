@@ -18,6 +18,7 @@ game.resources = [
 	 // Player Sprite Sheet
 	 { name: "test_run", type:"image", src:"game_assets/img/sprite/test_run.png" },
 	 { name: "gripe_run_right", type:"image", src:"game_assets/img/sprite/gripe_run_right.png" },
+	 { name: "player_animations", type:"image", src:"game_assets/img/sprite/runner.png"},
 
 	 // Coins 
 	 { name: "spinning_coin_gold", type: "image", src: "game_assets/img/sprite/spinning_coin_gold.png"},
@@ -29,7 +30,13 @@ game.resources = [
 	 // Maps
 	 { name: "area01", type:"tmx", src: "game_assets/map/area01.tmx"},
 	 { name: "area02", type:"tmx", src: "game_assets/map/area02.tmx"},
-	 { name: "area03", type:"tmx", src: "game_assets/map/area03.tmx"}
+	 { name: "area03", type:"tmx", src: "game_assets/map/area03.tmx"},
+
+	 // Mountains
+	 {name: "32x32_font", type:"image", src: "game_assets/img/font/32x32_font.png"},
+
+	 // Title Screen
+	 { name: "title_screen", type:"image", src: "game_assets/img/title.png"},
 
 	/* Atlases 
 	 * @example

@@ -3,7 +3,8 @@ var melon = me;
 
 var game = {
 	data : {
-		// DATA THAT PERSISTS
+		screens : 0,
+		
 	},
 	onload : function(){
 		// Initialize
@@ -26,8 +27,8 @@ var game = {
 		melon.state.change(melon.state.LOADING);
 	},
 	loaded: function(){
-		//melon.state.set(me.state.MENU, new game.TitleScreen());
-		melon.state.set(me.state.PLAY, new game.PlayScreen());
+		melon.state.set(melon.state.TITLE, new game.TitleScreen());
+		melon.state.set(melon.state.PLAY, new game.PlayScreen());
 
 		melon.pool.register("mainPlayer", game.PlayerEntity);
 		melon.pool.register("levelGate", game.LevelGate);
@@ -44,6 +45,6 @@ var game = {
     	melon.input.bindKey(me.input.KEY.SPACE,     "jump", true);
 
 		// Start the game.
-		melon.state.change(me.state.PLAY);
+		melon.state.change(me.state.TITLE);
 	}
 };
