@@ -28,7 +28,7 @@ game.PlayerEntity = melon.Entity.extend({
 
 		var me = this;
 
-		me.body.vel.x = 10;
+		me.body.vel.x = 15;
 
 		var playerRender = me.renderable;
 		// Jump
